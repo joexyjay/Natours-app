@@ -1,9 +1,17 @@
 import fs from 'fs'
-import express, {Request, Response} from 'express';
+import morgan from 'morgan'
+import express, {NextFunction, Request, Response} from 'express';
 
 const app = express()
 
 app.use(express.json())
+
+app.use(morgan('dev'))
+
+app.use((req:Request, response:Response, next:NextFunction)=> {
+    console.log('Hello from the middleware')
+    next()
+})
 
 const tours = JSON
 .parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
@@ -69,6 +77,28 @@ const deleteTour = (req:Request, res:Response) => {
     })
 }
 
+const getAllUsers = (req:Request, res:Response) => {
+    res.status(500).json({
+        msg: 'Internal server error',
+        data: 'error'
+    })
+}
+const createUser = (req:Request, res:Response) => {
+    res.status(500).json({
+        status: 'failed',
+        msg: 'not defined'
+    })
+}
+const getUser = (req:Request, res:Response) => {
+    res
+}
+const updateUser = (req:Request, res:Response) => {
+    res
+}
+const deleteUser = (req:Request, res:Response) => {
+    res
+}
+
 // app.get('/api/v1/tours', getAllTours)
 
 // app.get('/api/v1/tours/:id', getOneTour)
@@ -79,16 +109,25 @@ const deleteTour = (req:Request, res:Response) => {
 
 // app.delete('/api/v1/tours/:id', deleteTour)
 
-app
-    .route('/api/v1/tours')
+const tourRouter = express.Router()
+const userRouter = express.Router()
+
+tourRouter
+    .route('/')
     .get(getAllTours)
     .post(createTour)
-    
-app
-    .route('/api/v1/tours/:id')
+
+tourRouter
+    .route('/:id')
     .get(getOneTour)
     .patch(updateTour)
     .delete(deleteTour)
+
+userRouter.route('/').get(getAllUsers).post(createUser)
+userRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser)
+
+app.use('/api/v1/tours', tourRouter)
+app.use('/api/v1/users', userRouter)
 
 const port = 3000
 
