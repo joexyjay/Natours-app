@@ -1,5 +1,6 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { 
+    checkID,
     getAllTours, 
     createTour, 
     getOneTour, 
@@ -7,6 +8,8 @@ import {
     deleteTour } from "../controllers/tourController";
 
 const router = express.Router()
+
+router.param('id', checkID)
 
 router
     .route('/')

@@ -1,9 +1,22 @@
 import fs from 'fs'
-import { Request, Response} from "express";
+import express, { Request, Response, NextFunction } from "express";
 
 const tours = JSON
 .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 .toString())
+
+export const checkID = (req:Request, res:Response, next:NextFunction, val:number) => {
+    console.log(`Tour id is: ${val}`)
+    const id = parseInt(req.params.id)
+    console.log(id)
+    if (id  > tours.length) {
+        return res.status(404).json({
+            status: "failed",
+            msg: "unknown ID"
+        })
+    }
+    next()
+}
 
 export const getAllTours = (req:Request, res:Response) => {
     res.status(200).json({
