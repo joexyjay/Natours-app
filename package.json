@@ -4,7 +4,7 @@
   "description": "Learning express and nodeJs",
   "main": "app.ts",
   "scripts": {
-    "dev": "nodemon dist/app.js",
+    "dev": "nodemon dist/server.js",
     "watch": "tsc --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
