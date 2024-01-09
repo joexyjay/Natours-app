@@ -1,75 +1,51 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTour = exports.updateTour = exports.createTour = exports.getOneTour = exports.getAllTours = exports.checkBody = exports.checkID = void 0;
-const fs_1 = __importDefault(require("fs"));
-const tours = JSON
-    .parse(fs_1.default.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-    .toString());
-const checkID = (req, res, next, val) => {
-    console.log(`Tour id is: ${val}`);
-    const id = parseInt(req.params.id);
-    console.log(id);
-    if (id > tours.length) {
-        return res.status(404).json({
-            status: "failed",
-            msg: "unknown ID"
-        });
-    }
-    next();
-};
-exports.checkID = checkID;
-const checkBody = (req, res, next) => {
-    if (!req.body.name || !req.body.price) {
-        return res.status(404).json({
-            status: "failed",
-            msg: "missing name or price"
-        });
-    }
-    next();
-};
-exports.checkBody = checkBody;
+exports.deleteTour = exports.updateTour = exports.createTour = exports.getOneTour = exports.getAllTours = void 0;
+const tourModel_1 = __importDefault(require("../models/tourModel"));
+// const tours = JSON
+// .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
+// .toString())
 const getAllTours = (req, res) => {
     res.status(200).json({
         status: "success",
-        result: tours.length,
-        data: {
-            tours
-        }
     });
 };
 exports.getAllTours = getAllTours;
 const getOneTour = (req, res) => {
-    const id = parseInt(req.params.id);
-    const tour = tours.find((el) => el.id === id);
-    if (!tour) {
-        return res.status(404).json({
-            status: "failed",
-            msg: "invalid ID"
-        });
-    }
     res.status(200).json({
         status: "success",
-        data: {
-            tour
-        }
     });
 };
 exports.getOneTour = getOneTour;
-const createTour = (req, res) => {
-    // console.log(req.body)
-    const newID = tours[tours.length - 1].id + 1;
-    const newTour = Object.assign({ id: newID }, req.body);
-    tours.push(newTour);
-    fs_1.default.writeFile(`${__dirname}/../dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
+const createTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const newTour = yield tourModel_1.default.create(req.body);
         res.status(201).json({
             status: "success",
-            data: newTour
+            data: {
+                tour: newTour
+            }
         });
-    });
-};
+    }
+    catch (error) {
+        res.status(400).json({
+            status: "fail",
+            msg: "Tour creation failed"
+        });
+    }
+});
 exports.createTour = createTour;
 const updateTour = (req, res) => {
     res.status(200).json({
