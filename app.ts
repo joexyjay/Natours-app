@@ -14,7 +14,7 @@ if(process.env.NODE_ENV === "development") {
 
 app.use(express.static(`${__dirname}/public`))
 
-app.use((req:Request, response:Response, next:NextFunction)=> {
+app.use((req:Request, res:Response, next:NextFunction)=> {
     console.log('Hello from the middleware')
     next()
 })
