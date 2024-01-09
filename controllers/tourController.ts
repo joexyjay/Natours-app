@@ -5,19 +5,38 @@ import Tour from '../models/tourModel';
 // .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // .toString())
 
-export const getAllTours = (req:Request, res:Response) => {
-    res.status(200).json({
-        status: "success",
-       
-    })
+export const getAllTours = async (req:Request, res:Response) => {
+    try {
+        const allTours = await Tour.find()
+        res.status(200).json({
+            status: "success",
+            data: {
+                allTours
+            }
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: "fail",
+            msg: error
+        }) 
+    }
 }
 
-export const getOneTour = (req:Request, res:Response) => {
-    
-    res.status(200).json({
-        status:"success",
-       
-    })
+export const getOneTour = async (req:Request, res:Response) => {
+    try {
+        const tour = await Tour.findById(req.params.id)
+        res.status(200).json({
+            status: "success",
+            data: {
+                tour
+            }
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: "fail",
+            msg: error
+        }) 
+    }
 }
 
 export const createTour = async (req:Request, res:Response) => {

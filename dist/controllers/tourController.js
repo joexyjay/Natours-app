@@ -17,17 +17,41 @@ const tourModel_1 = __importDefault(require("../models/tourModel"));
 // const tours = JSON
 // .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // .toString())
-const getAllTours = (req, res) => {
-    res.status(200).json({
-        status: "success",
-    });
-};
+const getAllTours = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const allTours = yield tourModel_1.default.find();
+        res.status(200).json({
+            status: "success",
+            data: {
+                allTours
+            }
+        });
+    }
+    catch (error) {
+        res.status(400).json({
+            status: "fail",
+            msg: error
+        });
+    }
+});
 exports.getAllTours = getAllTours;
-const getOneTour = (req, res) => {
-    res.status(200).json({
-        status: "success",
-    });
-};
+const getOneTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const tour = yield tourModel_1.default.findById(req.params.id);
+        res.status(200).json({
+            status: "success",
+            data: {
+                tour
+            }
+        });
+    }
+    catch (error) {
+        res.status(400).json({
+            status: "fail",
+            msg: error
+        });
+    }
+});
 exports.getOneTour = getOneTour;
 const createTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
