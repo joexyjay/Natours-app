@@ -19,10 +19,18 @@ const tourModel_1 = __importDefault(require("../models/tourModel"));
 // .toString())
 const getAllTours = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const allTours = yield tourModel_1.default.find();
+        //BUILD QUERY
+        const queryObj = Object.assign({}, req.query);
+        const excludedFields = ['page', 'sort', 'limit', 'fields'];
+        excludedFields.forEach(el => delete queryObj[el]);
+        const query = tourModel_1.default.find(queryObj);
+        //EXECUTE QUERY
+        const allTours = yield query;
+        //SEND RESPONSE
         res.status(200).json({
             status: "success",
             data: {
+                results: allTours.length,
                 allTours
             }
         });
