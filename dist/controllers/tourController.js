@@ -71,18 +71,39 @@ const createTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.createTour = createTour;
-const updateTour = (req, res) => {
-    res.status(200).json({
-        status: "success",
-        data: {
-            tours: "updated tour successfully"
-        }
-    });
-};
+const updateTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const updatedTour = yield tourModel_1.default.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+        res.status(201).json({
+            status: "success",
+            data: {
+                tour: updatedTour
+            }
+        });
+    }
+    catch (error) {
+        res.status(400).json({
+            status: "fail",
+            msg: error
+        });
+    }
+});
 exports.updateTour = updateTour;
-const deleteTour = (req, res) => {
-    res.status(204).json({
-        data: null
-    });
-};
+const deleteTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield tourModel_1.default.findByIdAndDelete(req.params.id);
+        res.status(204).json({
+            data: null
+        });
+    }
+    catch (error) {
+        res.status(400).json({
+            status: "fail",
+            msg: error
+        });
+    }
+});
 exports.deleteTour = deleteTour;
