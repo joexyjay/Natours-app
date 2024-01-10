@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Tour from '../models/tourModel';
+import { SortOrder } from 'mongoose';
 
 // const tours = JSON
 // .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -18,10 +19,17 @@ export const getAllTours = async (req:Request, res:Response) => {
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`) 
         console.log(JSON.parse(queryStr))
         
-        let query = Tour.find(JSON.parse(queryStr))
+        let query = Tour.find(JSON.parse(queryStr));
+
+        //2) SORTING
+        if (typeof req.query.sort === 'string') {
+            query = query.sort(req.query.sort);
+        } else if (typeof req.query.sort === 'object') {
+            query = query.sort(req.query.sort as { [key: string]: SortOrder | { $meta: any } });
+        }
 
         //EXECUTE QUERY
-        const allTours = await query
+        const allTours = await query;
 
         //SEND RESPONSE
         res.status(200).json({

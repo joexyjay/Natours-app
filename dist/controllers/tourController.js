@@ -29,6 +29,13 @@ const getAllTours = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
         console.log(JSON.parse(queryStr));
         let query = tourModel_1.default.find(JSON.parse(queryStr));
+        //2) SORTING
+        if (typeof req.query.sort === 'string') {
+            query = query.sort(req.query.sort);
+        }
+        else if (typeof req.query.sort === 'object') {
+            query = query.sort(req.query.sort);
+        }
         //EXECUTE QUERY
         const allTours = yield query;
         //SEND RESPONSE
