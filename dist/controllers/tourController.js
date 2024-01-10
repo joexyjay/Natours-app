@@ -20,10 +20,15 @@ const tourModel_1 = __importDefault(require("../models/tourModel"));
 const getAllTours = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //BUILD QUERY
+        //1) Filtering
         const queryObj = Object.assign({}, req.query);
         const excludedFields = ['page', 'sort', 'limit', 'fields'];
         excludedFields.forEach(el => delete queryObj[el]);
-        const query = tourModel_1.default.find(queryObj);
+        //1B) Advanced filtering
+        let queryStr = JSON.stringify(queryObj);
+        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+        console.log(JSON.parse(queryStr));
+        let query = tourModel_1.default.find(JSON.parse(queryStr));
         //EXECUTE QUERY
         const allTours = yield query;
         //SEND RESPONSE
