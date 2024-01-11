@@ -6,6 +6,13 @@ import { SortOrder } from 'mongoose';
 // .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // .toString())
 
+export const aliasTopTours = (req:Request, res:Response, next:Function) => {
+    req.query.limit = '5';
+    req.query.sort = '-ratingsAverage,price';
+    req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+    next()
+}
+
 export const getAllTours = async (req:Request, res:Response) => {
     try {
         //BUILD QUERY

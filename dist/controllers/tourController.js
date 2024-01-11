@@ -12,11 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTour = exports.updateTour = exports.createTour = exports.getOneTour = exports.getAllTours = void 0;
+exports.deleteTour = exports.updateTour = exports.createTour = exports.getOneTour = exports.getAllTours = exports.aliasTopTours = void 0;
 const tourModel_1 = __importDefault(require("../models/tourModel"));
 // const tours = JSON
 // .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // .toString())
+const aliasTopTours = (req, res, next) => {
+    req.query.limit = '5';
+    req.query.sort = '-ratingsAverage,price';
+    req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+    next();
+};
+exports.aliasTopTours = aliasTopTours;
 const getAllTours = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //BUILD QUERY
