@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTour = exports.updateTour = exports.createTour = exports.getOneTour = exports.getAllTours = exports.aliasTopTours = void 0;
+exports.getTourStats = exports.deleteTour = exports.updateTour = exports.createTour = exports.getOneTour = exports.getAllTours = exports.aliasTopTours = void 0;
 const tourModel_1 = __importDefault(require("../models/tourModel"));
 // const tours = JSON
 // .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -155,3 +155,39 @@ const deleteTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.deleteTour = deleteTour;
+const getTourStats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const stats = yield tourModel_1.default.aggregate([
+            {
+                $match: { ratingsAverage: { $gte: 4.5 } }
+            },
+            {
+                $group: {
+                    _id: '$difficulty',
+                    numTours: { $sum: 1 },
+                    numRatings: { $sum: '$ratingsQuantity' },
+                    avgRating: { $avg: '$ratingsAverage' },
+                    avgPrice: { $avg: '$price' },
+                    minPrice: { $min: '$price' },
+                    maxPrice: { $max: '$price' }
+                }
+            },
+            {
+                $sort: { avgPrice: 1 }
+            }
+        ]);
+        res.status(200).json({
+            status: "success",
+            data: {
+                stats
+            }
+        });
+    }
+    catch (error) {
+        res.status(400).json({
+            status: "fail",
+            msg: error
+        });
+    }
+});
+exports.getTourStats = getTourStats;

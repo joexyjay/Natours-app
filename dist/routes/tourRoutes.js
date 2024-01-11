@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const tourController_1 = require("../controllers/tourController");
 const router = express_1.default.Router();
 router.route('/top-5-cheap').get(tourController_1.aliasTopTours, tourController_1.getAllTours);
+router.route('/tour-stats').get(tourController_1.getTourStats);
 router
     .route('/')
     .get(tourController_1.getAllTours)

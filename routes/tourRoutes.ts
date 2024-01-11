@@ -5,11 +5,15 @@ import {
     createTour, 
     getOneTour, 
     updateTour, 
-    deleteTour } from "../controllers/tourController";
+    deleteTour,
+    getTourStats,
+ } from "../controllers/tourController";
 
 const router = express.Router()
 
 router.route('/top-5-cheap').get(aliasTopTours, getAllTours)
+
+router.route('/tour-stats').get(getTourStats)
 
 router
     .route('/')
