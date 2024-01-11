@@ -53,6 +53,7 @@ const tourSchema = new mongoose.Schema({
     description: {
         type: String,
         trim: true,
+        // select: false // This will hide the description field from the response
     },
     imageCover: {
         type: String,

@@ -26,6 +26,16 @@ export const getAllTours = async (req:Request, res:Response) => {
             query = query.sort(req.query.sort);
         } else if (typeof req.query.sort === 'object') {
             query = query.sort(req.query.sort as { [key: string]: SortOrder | { $meta: any } });
+        } else {
+            query = query.sort('-createdAt');
+        }
+
+        //3) FIELD LIMITING
+        if (req.query.fields) {
+            const fields = (req.query.fields as string).split(',').join(' ');
+            query = query.select(fields)
+        } else {
+            query = query.select('-__v')
         }
 
         //EXECUTE QUERY

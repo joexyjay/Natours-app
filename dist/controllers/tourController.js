@@ -36,6 +36,17 @@ const getAllTours = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         else if (typeof req.query.sort === 'object') {
             query = query.sort(req.query.sort);
         }
+        else {
+            query = query.sort('-createdAt');
+        }
+        //3) FIELD LIMITING
+        if (req.query.fields) {
+            const fields = req.query.fields.split(',').join(' ');
+            query = query.select(fields);
+        }
+        else {
+            query = query.select('-__v');
+        }
         //EXECUTE QUERY
         const allTours = yield query;
         //SEND RESPONSE
