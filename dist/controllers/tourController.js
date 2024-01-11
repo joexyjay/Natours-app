@@ -47,6 +47,16 @@ const getAllTours = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         else {
             query = query.select('-__v');
         }
+        //4) PAGINATION
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 100;
+        const skip = (page - 1) * limit;
+        query = query.skip(skip).limit(limit);
+        if (req.query.page) {
+            const numTours = yield tourModel_1.default.countDocuments();
+            if (skip >= numTours)
+                throw new Error('This page does not exist');
+        }
         //EXECUTE QUERY
         const allTours = yield query;
         //SEND RESPONSE
