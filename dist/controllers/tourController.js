@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTourStats = exports.deleteTour = exports.updateTour = exports.createTour = exports.getOneTour = exports.getAllTours = exports.aliasTopTours = void 0;
+exports.getMonthlyPlan = exports.getTourStats = exports.deleteTour = exports.updateTour = exports.createTour = exports.getOneTour = exports.getAllTours = exports.aliasTopTours = void 0;
 const tourModel_1 = __importDefault(require("../models/tourModel"));
 // const tours = JSON
 // .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -191,3 +191,54 @@ const getTourStats = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getTourStats = getTourStats;
+// This function is to check the number of tours in each month so as to know the busiest month in a given year
+const getMonthlyPlan = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const year = Number(req.params.year);
+        const plan = yield tourModel_1.default.aggregate([
+            {
+                $unwind: '$startDates'
+            },
+            {
+                $match: {
+                    startDates: {
+                        $gte: new Date(`${year}-01-01`),
+                        $lte: new Date(`${year}-12-31`)
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: { $month: '$startDates' },
+                    numTourStarts: { $sum: 1 },
+                    tours: { $push: '$name' }
+                }
+            },
+            {
+                $addFields: { month: '$_id' }
+            },
+            {
+                $project: { _id: 0 }
+            },
+            {
+                $sort: { numTourStarts: -1 }
+            },
+            {
+                $limit: 12
+            }
+        ]);
+        res.status(200).json({
+            status: "success",
+            data: {
+                plan
+            }
+        });
+    }
+    catch (error) {
+        res.status(400).json({
+            status: "fail",
+            msg: error
+        });
+    }
+});
+exports.getMonthlyPlan = getMonthlyPlan;
