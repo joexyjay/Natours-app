@@ -19,4 +19,10 @@ app.use((req, res, next) => {
 });
 app.use('/api/v1/tours', tourRoutes_1.default);
 app.use('/api/v1/users', userRoutes_1.default);
+app.all('*', (req, res, next) => {
+    res.status(404).json({
+        status: 'fail',
+        message: `Can't find ${req.originalUrl} on this server`
+    });
+});
 exports.default = app;
