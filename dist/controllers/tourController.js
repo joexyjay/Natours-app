@@ -114,7 +114,7 @@ const createTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         res.status(400).json({
             status: "fail",
-            msg: "Tour creation failed"
+            msg: error
         });
     }
 });

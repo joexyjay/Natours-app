@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import validator from "validator";
 
 export interface TourInstance extends mongoose.Document {
     name: string;
@@ -21,7 +22,10 @@ const tourSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        trim: true
+        trim: true,
+        minlength: [10, 'A tour must be more than 10 characters'],
+        maxlength: [40, 'A tour must be below 40 characters'],
+        // validate: [validator.isAlpha, 'Tour name must only contain characters'] // This will only work on new document creation, and also if you dont want spaces
     },
     duration: {
         type: Number,
@@ -33,18 +37,36 @@ const tourSchema = new mongoose.Schema({
     },
     difficulty: {
         type: String,
-        required: true
+        required: true,
+        enum: {
+            values: ['easy', 'medium', 'difficulty'],
+            message: 'Difficulty is either easy, medium or difficulty'
+        }
     },
     ratingsAverage: {
         type: Number,
-        default: 4.5
+        default: 4.5,
+        min: [1, 'Rating must be above 1'],
+        max: [5, 'Rating must be below 5']
     },
     ratingsQuantity: {
         type: Number,
         default: 0
     },
-    price: Number,
-    priceDiscount: Number,
+    price: {
+        type: Number,
+        required: true
+    },
+    priceDiscount: {
+        type: Number,
+        validate: {
+            // This only points to current doc on NEW document creation
+            validator: function (this: TourInstance, val: number) {
+                return val < this.price;
+            }
+        },
+        message: 'Discount price should be below regular price'
+    },
     summary: {
         type: String,
         trim: true,
@@ -64,6 +86,11 @@ const tourSchema = new mongoose.Schema({
 },
 {
     timestamps: true
+})
+
+//DOCUMENT MIDDLEWARE: Runs before .save() and .create() command
+tourSchema.pre('save', function(){
+    console.log(this)
 })
 
 const Tour = mongoose.model<TourInstance>('Tour', tourSchema)

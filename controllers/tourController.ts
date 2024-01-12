@@ -104,7 +104,7 @@ export const createTour = async (req:Request, res:Response) => {
    } catch (error) {
     res.status(400).json({
         status: "fail",
-        msg: "Tour creation failed"
+        msg: error
     }) 
    }
 }
