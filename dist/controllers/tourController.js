@@ -86,6 +86,12 @@ exports.getAllTours = getAllTours;
 const getOneTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const tour = yield tourModel_1.default.findById(req.params.id);
+        if (!tour) {
+            return res.status(404).json({
+                status: "fail",
+                msg: "No tour found with that ID"
+            });
+        }
         res.status(200).json({
             status: "success",
             data: {
@@ -103,7 +109,14 @@ const getOneTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 exports.getOneTour = getOneTour;
 const createTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const newTour = yield tourModel_1.default.create(req.body);
+        let newTour = yield tourModel_1.default.findOne({ name: req.body.name });
+        if (newTour) {
+            return res.status(400).json({
+                status: "fail",
+                msg: "Tour already exists"
+            });
+        }
+        newTour = yield tourModel_1.default.create(req.body);
         res.status(201).json({
             status: "success",
             data: {
@@ -114,7 +127,7 @@ const createTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         res.status(400).json({
             status: "fail",
-            msg: error
+            msg: error.message
         });
     }
 });
@@ -125,6 +138,12 @@ const updateTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             new: true,
             runValidators: true
         });
+        if (!updatedTour) {
+            return res.status(404).json({
+                status: "fail",
+                msg: "No tour found with that ID"
+            });
+        }
         res.status(201).json({
             status: "success",
             data: {
@@ -142,7 +161,13 @@ const updateTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 exports.updateTour = updateTour;
 const deleteTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield tourModel_1.default.findByIdAndDelete(req.params.id);
+        const tour = yield tourModel_1.default.findByIdAndDelete(req.params.id);
+        if (!tour) {
+            return res.status(404).json({
+                status: "fail",
+                msg: "No tour found with that ID"
+            });
+        }
         res.status(204).json({
             data: null
         });

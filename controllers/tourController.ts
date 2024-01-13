@@ -78,6 +78,13 @@ export const getAllTours = async (req:Request, res:Response) => {
 export const getOneTour = async (req:Request, res:Response) => {
     try {
         const tour = await Tour.findById(req.params.id)
+
+        if(!tour) {
+            return res.status(404).json({
+                status: "fail",
+                msg: "No tour found with that ID"
+            })
+        }
         res.status(200).json({
             status: "success",
             data: {
@@ -94,17 +101,24 @@ export const getOneTour = async (req:Request, res:Response) => {
 
 export const createTour = async (req:Request, res:Response) => {
    try {
-    const newTour = await Tour.create(req.body)
+    let newTour = await Tour.findOne({ name: req.body.name })
+    if(newTour) {
+        return res.status(400).json({
+            status: "fail",
+            msg: "Tour already exists"
+        })
+    } 
+    newTour = await Tour.create(req.body)
     res.status(201).json({
         status: "success",
         data: {
             tour: newTour
         }
     })
-   } catch (error) {
+   } catch (error:any) {
     res.status(400).json({
         status: "fail",
-        msg: error
+        msg: error.message
     }) 
    }
 }
@@ -117,6 +131,12 @@ export const updateTour = async (req:Request, res:Response) => {
                 runValidators: true
             }
         )
+        if(!updatedTour) {
+            return res.status(404).json({
+                status: "fail",
+                msg: "No tour found with that ID"
+            })
+        }
         res.status(201).json({
             status: "success",
             data: {
@@ -134,7 +154,13 @@ export const updateTour = async (req:Request, res:Response) => {
 
 export const deleteTour = async (req:Request, res:Response) => {
     try {
-        await Tour.findByIdAndDelete(req.params.id)
+        const tour = await Tour.findByIdAndDelete(req.params.id)
+        if(!tour) {
+            return res.status(404).json({
+                status: "fail",
+                msg: "No tour found with that ID"
+            })
+        }
         res.status(204).json({
             data: null
         })
