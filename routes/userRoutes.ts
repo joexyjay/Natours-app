@@ -1,5 +1,5 @@
 import express, {Request, Response, NextFunction} from "express";
-import { signUp } from "../controllers/authController";
+import { signUp, login } from "../controllers/authController";
 import { 
     getAllUsers, 
     createUser, 
@@ -15,6 +15,7 @@ router.param('id', (req:Request, res:Response, next:NextFunction, val:number) =>
 })
 
 router.post('/signup', signUp)
+router.post('/login', login)
 
 router.route('/').get(getAllUsers).post(createUser)
 router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser)

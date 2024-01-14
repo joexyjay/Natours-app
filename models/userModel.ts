@@ -8,6 +8,7 @@ export interface UserInstance extends mongoose.Document {
     photo: string;
     password: string;
     passwordConfirm: string | undefined;
+    correctPassword(candidatePassword: string, userPassword: string): Promise<boolean>;
 }
 
 const userSchema = new mongoose.Schema<UserInstance>({
@@ -27,6 +28,7 @@ const userSchema = new mongoose.Schema<UserInstance>({
         type: String,
         required: [true, "Please provide a password"],
         minlength: 8,
+        select: false
     },
     passwordConfirm: {
         type: String,
@@ -54,6 +56,13 @@ userSchema.pre('save', async function(next) {
     // Delete passwordConfirm field
     this.passwordConfirm = undefined
 })
+
+userSchema.methods.correctPassword = async function(
+    candidatePassword: string, 
+    userPassword: string
+    ) {
+    return await bcrypt.compare(candidatePassword, userPassword)
+}
 
 const User = mongoose.model<UserInstance>("User", userSchema);
 
