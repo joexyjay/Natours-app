@@ -9,6 +9,8 @@ export interface UserInstance extends mongoose.Document {
     password: string;
     passwordConfirm: string | undefined;
     correctPassword(candidatePassword: string, userPassword: string): Promise<boolean>;
+    passwordChangedAt: Date;
+    changedPasswordAfter(JWTTimestamp: number): boolean;
 }
 
 const userSchema = new mongoose.Schema<UserInstance>({
@@ -41,6 +43,7 @@ const userSchema = new mongoose.Schema<UserInstance>({
             message: "Passwords are not the same"
         }
     },
+    passwordChangedAt: Date,
 },
 {
     timestamps: true,
@@ -62,6 +65,14 @@ userSchema.methods.correctPassword = async function(
     userPassword: string
     ) {
     return await bcrypt.compare(candidatePassword, userPassword)
+}
+
+userSchema.methods.changedPasswordAfter = function(JWTTimestamp: number) {
+    if(this.passwordChangedAt) {
+        const changedTimestamp = parseInt(String(this.passwordChangedAt.getTime() / 1000), 10);
+        return JWTTimestamp < changedTimestamp;
+    }
+    return false;
 }
 
 const User = mongoose.model<UserInstance>("User", userSchema);

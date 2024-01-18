@@ -1,4 +1,5 @@
 import express from "express";
+import { protect } from "../controllers/authController";
 import { 
     aliasTopTours,
     getAllTours, 
@@ -20,7 +21,7 @@ router.route('/monthly-plan/:year').get(getMonthlyPlan)
 
 router
     .route('/')
-    .get(getAllTours)
+    .get(protect, getAllTours)
     .post(createTour)
 
 router
