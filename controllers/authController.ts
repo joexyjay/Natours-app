@@ -10,7 +10,7 @@ const signToken = (id: any) => {
 
 export const signUp = async (req:Request, res:Response) => {
     try {
-        const {name, email, photo, password, passwordConfirm} = req.body
+        const {name, email, photo, role, password, passwordConfirm} = req.body
         let newUser = await User.findOne({email})
         if(newUser) {
             return res.status(404).json({
@@ -22,6 +22,7 @@ export const signUp = async (req:Request, res:Response) => {
             name,
             email,
             photo,
+            role,
             password,
             passwordConfirm
         })
@@ -121,5 +122,17 @@ export const protect = async (req:AuthRequest, res:Response, next:NextFunction  
             msg: error.message,
         })
         
+    }
+}
+
+export const restrictTo = (...roles:any) => {
+    return (req:AuthRequest, res:Response, next:NextFunction) => {
+        if(!roles.includes(req.user.role)) {
+            return res.status(403).json({
+                status: "fail",
+                msg: "You do not have permission to perform this action"
+            })
+        }
+        next()
     }
 }

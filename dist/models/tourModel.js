@@ -74,8 +74,8 @@ const tourSchema = new mongoose_1.default.Schema({
     timestamps: true
 });
 //DOCUMENT MIDDLEWARE: Runs before .save() and .create() command
-tourSchema.pre('save', function () {
-    console.log(this);
-});
+// tourSchema.pre('save', function(){
+//     console.log(this)
+// })
 const Tour = mongoose_1.default.model('Tour', tourSchema);
 exports.default = Tour;

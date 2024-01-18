@@ -78,7 +78,7 @@ const getAllTours = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     catch (error) {
         res.status(400).json({
             status: "fail",
-            msg: error
+            msg: error.message
         });
     }
 });
@@ -102,7 +102,7 @@ const getOneTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         res.status(400).json({
             status: "fail",
-            msg: error
+            msg: error.message
         });
     }
 });
@@ -154,7 +154,7 @@ const updateTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         res.status(400).json({
             status: "fail",
-            msg: error
+            msg: error.message
         });
     }
 });
@@ -168,14 +168,15 @@ const deleteTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 msg: "No tour found with that ID"
             });
         }
-        res.status(204).json({
-            data: null
+        res.status(200).json({
+            status: 'success',
+            message: 'Tour deleted successfully',
         });
     }
     catch (error) {
-        res.status(400).json({
+        res.status(500).json({
             status: "fail",
-            msg: error
+            msg: 'internal server error'
         });
     }
 });
@@ -211,7 +212,7 @@ const getTourStats = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     catch (error) {
         res.status(400).json({
             status: "fail",
-            msg: error
+            msg: error.message
         });
     }
 });
@@ -262,7 +263,7 @@ const getMonthlyPlan = (req, res) => __awaiter(void 0, void 0, void 0, function*
     catch (error) {
         res.status(400).json({
             status: "fail",
-            msg: error
+            msg: error.message
         });
     }
 });

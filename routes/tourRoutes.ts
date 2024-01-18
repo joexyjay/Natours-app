@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../controllers/authController";
+import { protect, restrictTo } from "../controllers/authController";
 import { 
     aliasTopTours,
     getAllTours, 
@@ -28,6 +28,6 @@ router
     .route('/:id')
     .get(getOneTour)
     .patch(updateTour)
-    .delete(deleteTour)
+    .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour)
 
 export default router

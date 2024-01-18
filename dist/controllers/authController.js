@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.protect = exports.login = exports.signUp = void 0;
+exports.restrictTo = exports.protect = exports.login = exports.signUp = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const userModel_1 = __importDefault(require("../models/userModel"));
 const signToken = (id) => {
@@ -22,7 +22,7 @@ const signToken = (id) => {
 };
 const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, email, photo, password, passwordConfirm } = req.body;
+        const { name, email, photo, role, password, passwordConfirm } = req.body;
         let newUser = yield userModel_1.default.findOne({ email });
         if (newUser) {
             return res.status(404).json({
@@ -34,6 +34,7 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             name,
             email,
             photo,
+            role,
             password,
             passwordConfirm
         });
@@ -126,3 +127,15 @@ const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.protect = protect;
+const restrictTo = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return res.status(403).json({
+                status: "fail",
+                msg: "You do not have permission to perform this action"
+            });
+        }
+        next();
+    };
+};
+exports.restrictTo = restrictTo;

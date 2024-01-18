@@ -89,9 +89,9 @@ const tourSchema = new mongoose.Schema({
 })
 
 //DOCUMENT MIDDLEWARE: Runs before .save() and .create() command
-tourSchema.pre('save', function(){
-    console.log(this)
-})
+// tourSchema.pre('save', function(){
+//     console.log(this)
+// })
 
 const Tour = mongoose.model<TourInstance>('Tour', tourSchema)
 

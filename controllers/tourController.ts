@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Tour from '../models/tourModel';
-import { SortOrder } from 'mongoose';
+import { AnyExpression, SortOrder } from 'mongoose';
 
 // const tours = JSON
 // .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -67,10 +67,10 @@ export const getAllTours = async (req:Request, res:Response) => {
                 allTours
             }
         })
-    } catch (error) {
+    } catch (error:any) {
         res.status(400).json({
             status: "fail",
-            msg: error
+            msg: error.message
         }) 
     }
 }
@@ -91,10 +91,10 @@ export const getOneTour = async (req:Request, res:Response) => {
                 tour
             }
         })
-    } catch (error) {
+    } catch (error:any) {
         res.status(400).json({
             status: "fail",
-            msg: error
+            msg: error.message
         }) 
     }
 }
@@ -144,10 +144,10 @@ export const updateTour = async (req:Request, res:Response) => {
             }
         })
         
-    } catch (error) {
+    } catch (error:any) {
         res.status(400).json({
             status: "fail",
-            msg: error
+            msg: error.message
         }) 
     }
 }
@@ -161,13 +161,14 @@ export const deleteTour = async (req:Request, res:Response) => {
                 msg: "No tour found with that ID"
             })
         }
-        res.status(204).json({
-            data: null
+        res.status(200).json({
+            status: 'success',
+            message: 'Tour deleted successfully',
         })
-    } catch (error) {
-        res.status(400).json({
+    } catch (error:any) {
+        res.status(500).json({
             status: "fail",
-            msg: error
+            msg: 'internal server error'
         }) 
     } 
    
@@ -200,10 +201,10 @@ export const getTourStats = async (req:Request, res:Response) => {
                 stats
             }
         })
-    } catch (error) {
+    } catch (error:any) {
         res.status(400).json({
             status: "fail",
-            msg: error
+            msg: error.message
         }) 
     }
 }
@@ -249,10 +250,10 @@ export const getMonthlyPlan = async (req:Request, res:Response) => {
                 plan
             }
         })
-    } catch (error) {
+    } catch (error:any) {
         res.status(400).json({
             status: "fail",
-            msg: error
+            msg: error.message
         }) 
     }
 }
