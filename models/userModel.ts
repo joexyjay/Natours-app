@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
@@ -12,6 +13,9 @@ export interface UserInstance extends mongoose.Document {
     correctPassword(candidatePassword: string, userPassword: string): Promise<boolean>;
     passwordChangedAt: Date;
     changedPasswordAfter(JWTTimestamp: number): boolean;
+    passwordResetToken: string;
+    passwordResetExpires: Date;
+    createPasswordResetToken(): string;
 }
 
 const userSchema = new mongoose.Schema<UserInstance>({
@@ -48,8 +52,10 @@ const userSchema = new mongoose.Schema<UserInstance>({
             },
             message: "Passwords are not the same"
         }
-    },
+    }, 
     passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
 },
 {
     timestamps: true,
@@ -66,11 +72,18 @@ userSchema.pre('save', async function(next) {
     this.passwordConfirm = undefined
 })
 
+userSchema.pre('save', function(next) {
+    if(!this.isModified('password') || this.isNew) return next()
+
+    this.passwordChangedAt = new Date(Date.now() - 1000);
+    next();
+});
+
 userSchema.methods.correctPassword = async function(
     candidatePassword: string, 
     userPassword: string
     ) {
-    return await bcrypt.compare(candidatePassword, userPassword)
+    return await bcrypt.compare(candidatePassword, userPassword);
 }
 
 userSchema.methods.changedPasswordAfter = function(JWTTimestamp: number) {
@@ -79,6 +92,21 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp: number) {
         return JWTTimestamp < changedTimestamp;
     }
     return false;
+}
+
+userSchema.methods.createPasswordResetToken = function() {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+    console.log({resetToken}, this.passwordResetToken)
+
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+    return resetToken; 
 }
 
 const User = mongoose.model<UserInstance>("User", userSchema);

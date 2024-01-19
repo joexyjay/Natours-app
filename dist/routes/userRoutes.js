@@ -13,6 +13,8 @@ router.param('id', (req, res, next, val) => {
 });
 router.post('/signup', authController_1.signUp);
 router.post('/login', authController_1.login);
+router.post('/forgotPassword', authController_1.forgotPassword);
+router.patch('/resetPassword/:token', authController_1.resetPassword);
 router.route('/').get(userController_1.getAllUsers).post(userController_1.createUser);
 router.route('/:id').get(userController_1.getUser).patch(userController_1.updateUser).delete(userController_1.deleteUser);
 exports.default = router;

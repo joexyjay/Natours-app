@@ -12,9 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.restrictTo = exports.protect = exports.login = exports.signUp = void 0;
+exports.resetPassword = exports.forgotPassword = exports.restrictTo = exports.protect = exports.login = exports.signUp = void 0;
+const crypto_1 = __importDefault(require("crypto"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const userModel_1 = __importDefault(require("../models/userModel"));
+const email_1 = __importDefault(require("../utils/email"));
 const signToken = (id) => {
     return jsonwebtoken_1.default.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN
@@ -139,3 +141,95 @@ const restrictTo = (...roles) => {
     };
 };
 exports.restrictTo = restrictTo;
+const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // 1) Get user based on POSTed email
+    const user = yield userModel_1.default.findOne({ email: req.body.email });
+    if (!user) {
+        return res.status(404).json({
+            status: "fail",
+            msg: "There is no user with this email address"
+        });
+    }
+    // 2) Generate the random reset token
+    const resetToken = user.createPasswordResetToken();
+    yield user.save({ validateBeforeSave: false });
+    // 3) Send it to user's email
+    const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+    const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+    try {
+        yield (0, email_1.default)({
+            email: user.email,
+            subject: "Your password reset token (valid for 10 min)",
+            message
+        });
+        console.log('Email sent successfully');
+        res.status(200).json({
+            status: "success",
+            msg: "Token sent to email"
+        });
+    }
+    catch (error) {
+        console.error('Error sending email:', error);
+        user.passwordResetToken = undefined || '';
+        // Set a default expiration (e.g., 10 minutes from now)
+        const defaultExpiration = new Date();
+        defaultExpiration.setMinutes(defaultExpiration.getMinutes() + 10);
+        user.passwordResetExpires = defaultExpiration;
+        yield user.save({ validateBeforeSave: false });
+        return res.status(500).json({
+            status: "fail",
+            msg: error.message
+        });
+    }
+});
+exports.forgotPassword = forgotPassword;
+const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // 1) Get user based on the token
+        const hashedToken = crypto_1.default
+            .createHash('sha256')
+            .update(req.params.token)
+            .digest('hex');
+        const user = yield userModel_1.default.findOne({
+            passwordResetToken: hashedToken,
+            passwordResetExpires: { $gt: Date.now() }
+        });
+        // 2) If token has not expired, and there is a user, set the new password
+        if (!user) {
+            return res.status(400).json({
+                status: "fail",
+                msg: "Token is invalid or has expired"
+            });
+        }
+        // Check if passwords match
+        if (req.body.password !== req.body.passwordConfirm) {
+            return res.status(400).json({
+                status: "fail",
+                msg: "Passwords do not match"
+            });
+        }
+        user.password = req.body.password;
+        user.passwordConfirm = req.body.passwordConfirm;
+        user.passwordResetToken = undefined || '';
+        // Set a default expiration (e.g., 10 minutes from now)
+        const defaultExpiration = new Date();
+        defaultExpiration.setMinutes(defaultExpiration.getMinutes() + 10);
+        user.passwordResetExpires = defaultExpiration;
+        yield user.save();
+        // 3) Update changedPasswordAt property for the user
+        // 4) Log the user in, send JWT
+        const token = signToken(user._id);
+        res.status(200).json({
+            status: "success",
+            token
+        });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({
+            status: "error",
+            msg: err.message
+        });
+    }
+});
+exports.resetPassword = resetPassword;
