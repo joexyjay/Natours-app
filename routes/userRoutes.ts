@@ -1,5 +1,11 @@
 import express, {Request, Response, NextFunction} from "express";
-import { signUp, login, forgotPassword, resetPassword } from "../controllers/authController";
+import { 
+    signUp, 
+    login, 
+    forgotPassword, 
+    resetPassword, 
+    updatePassword, 
+    protect} from "../controllers/authController";
 import { 
     getAllUsers, 
     createUser, 
@@ -19,6 +25,7 @@ router.post('/login', login)
 
 router.post('/forgotPassword', forgotPassword)
 router.patch('/resetPassword/:token', resetPassword)
+router.patch('/updatePassword', protect, updatePassword)
 
 router.route('/').get(getAllUsers).post(createUser)
 router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser)

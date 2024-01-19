@@ -242,3 +242,45 @@ export const resetPassword = async (req: Request, res: Response) => {
         });
     }
 }
+
+export const updatePassword = async (req: AuthRequest, res: Response) => {
+    try {
+        // 1) Get user from collection
+        const user = await User.findById(req.user.id).select('+password')
+
+        // 2) Check if POSTed current password is correct
+        if (!user || !(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+            return res.status(401).json({
+                status: "fail",
+                msg: "Your current password is wrong"
+            })
+        }
+
+        // 3) Check if new password and password confirmation match
+        if (req.body.password !== req.body.passwordConfirm) {
+            return res.status(400).json({
+                status: "fail",
+                msg: "New password and password confirmation do not match"
+            })
+        }
+
+        // 4) If so, update password
+        user.password = req.body.password
+        user.passwordConfirm = req.body.passwordConfirm
+        await user.save()
+
+        // 5) Log user in, send JWT
+        const token = signToken(user._id)
+        res.status(200).json({
+            status: "success",
+            token
+        })
+    } catch (err:any) {
+        console.error(err);
+        res.status(500).json({
+            status: "error",
+            msg: err.message
+        });
+    }
+}
+

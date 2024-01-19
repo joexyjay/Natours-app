@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetPassword = exports.forgotPassword = exports.restrictTo = exports.protect = exports.login = exports.signUp = void 0;
+exports.updatePassword = exports.resetPassword = exports.forgotPassword = exports.restrictTo = exports.protect = exports.login = exports.signUp = void 0;
 const crypto_1 = __importDefault(require("crypto"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const userModel_1 = __importDefault(require("../models/userModel"));
@@ -233,3 +233,41 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.resetPassword = resetPassword;
+const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // 1) Get user from collection
+        const user = yield userModel_1.default.findById(req.user.id).select('+password');
+        // 2) Check if POSTed current password is correct
+        if (!user || !(yield user.correctPassword(req.body.passwordCurrent, user.password))) {
+            return res.status(401).json({
+                status: "fail",
+                msg: "Your current password is wrong"
+            });
+        }
+        // 3) Check if new password and password confirmation match
+        if (req.body.password !== req.body.passwordConfirm) {
+            return res.status(400).json({
+                status: "fail",
+                msg: "New password and password confirmation do not match"
+            });
+        }
+        // 4) If so, update password
+        user.password = req.body.password;
+        user.passwordConfirm = req.body.passwordConfirm;
+        yield user.save();
+        // 5) Log user in, send JWT
+        const token = signToken(user._id);
+        res.status(200).json({
+            status: "success",
+            token
+        });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({
+            status: "error",
+            msg: err.message
+        });
+    }
+});
+exports.updatePassword = updatePassword;
