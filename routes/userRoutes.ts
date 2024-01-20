@@ -7,7 +7,8 @@ import {
     updatePassword, 
     protect} from "../controllers/authController";
 import { 
-    getAllUsers, 
+    getAllUsers,
+    updateMe, 
     createUser, 
     getUser, 
     updateUser, 
@@ -26,6 +27,8 @@ router.post('/login', login)
 router.post('/forgotPassword', forgotPassword)
 router.patch('/resetPassword/:token', resetPassword)
 router.patch('/updatePassword', protect, updatePassword)
+
+router.patch('/updateMe', protect, updateMe)
 
 router.route('/').get(getAllUsers).post(createUser)
 router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser)
