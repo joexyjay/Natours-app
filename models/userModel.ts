@@ -2,6 +2,7 @@ import crypto from "crypto";
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
+import { Query } from 'mongoose';
 
 export interface UserInstance extends mongoose.Document {
     name: string;
@@ -16,6 +17,7 @@ export interface UserInstance extends mongoose.Document {
     passwordResetToken: string;
     passwordResetExpires: Date;
     createPasswordResetToken(): string;
+    active: boolean;
 }
 
 const userSchema = new mongoose.Schema<UserInstance>({
@@ -56,6 +58,11 @@ const userSchema = new mongoose.Schema<UserInstance>({
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
+    active: {
+        type: Boolean,
+        default: true,
+        select: false
+    }
 },
 {
     timestamps: true,
@@ -76,6 +83,12 @@ userSchema.pre('save', function(next) {
     if(!this.isModified('password') || this.isNew) return next()
 
     this.passwordChangedAt = new Date(Date.now() - 1000);
+    next();
+});
+
+userSchema.pre<Query<any, any, {}, any, "find">>(/^find/, function(next) {
+    // this points to the current query
+    this.find({ active: { $ne: false } });
     next();
 });
 

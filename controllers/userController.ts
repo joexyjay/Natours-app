@@ -43,6 +43,15 @@ export const updateMe = async (req:AuthRequest, res:Response) => {
     })
 }
 
+export const deleteMe = async (req:AuthRequest, res:Response) => {
+    await User.findByIdAndUpdate(req.user.id, {active: false})
+
+    res.status(204).json({
+        status: 'success',
+        data: null
+    })
+}
+
 export const createUser = (req:Request, res:Response) => {
     res.status(500).json({
         status: 'failed',

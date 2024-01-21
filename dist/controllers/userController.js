@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.updateUser = exports.getUser = exports.createUser = exports.updateMe = exports.getAllUsers = void 0;
+exports.deleteUser = exports.updateUser = exports.getUser = exports.createUser = exports.deleteMe = exports.updateMe = exports.getAllUsers = void 0;
 const userModel_1 = __importDefault(require("../models/userModel"));
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const users = yield userModel_1.default.find();
@@ -51,6 +51,14 @@ const updateMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.updateMe = updateMe;
+const deleteMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield userModel_1.default.findByIdAndUpdate(req.user.id, { active: false });
+    res.status(204).json({
+        status: 'success',
+        data: null
+    });
+});
+exports.deleteMe = deleteMe;
 const createUser = (req, res) => {
     res.status(500).json({
         status: 'failed',
