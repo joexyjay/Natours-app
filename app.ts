@@ -1,4 +1,5 @@
 import express, {NextFunction, Request, Response} from 'express';
+import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import tourRouter from './routes/tourRoutes';
 import userRouter from './routes/userRoutes'
@@ -7,6 +8,7 @@ import userRouter from './routes/userRoutes'
 const app = express()
 
 app.use(express.json())
+app.use(cookieParser())
 
 if(process.env.NODE_ENV === "development") {
     app.use(morgan('dev'))

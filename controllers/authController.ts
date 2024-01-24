@@ -1,14 +1,10 @@
 import {Request, Response, NextFunction} from 'express'
 import crypto from 'crypto'
-import jwt from 'jsonwebtoken'
 import User from '../models/userModel'
+import jwt from 'jsonwebtoken'
+import generateToken from '../utils/generateToken'
 import sendEmail from '../utils/email'
 
-const signToken = (id: any) => {
-    return jwt.sign({id}, process.env.JWT_SECRET as string, {
-        expiresIn: process.env.JWT_EXPIRES_IN
-    })
-}
 
 export const signUp = async (req:Request, res:Response) => {
     try {
@@ -28,14 +24,10 @@ export const signUp = async (req:Request, res:Response) => {
             password,
             passwordConfirm
         })
-
-        const token = signToken(newUser._id)
         newUser.password = undefined || ''
-        res.cookie('jwt', token, {
-            expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-            httpOnly: true
-        })
-        .status(201).json({
+
+        generateToken(res, newUser._id)
+        res.status(201).json({
             status: "success",
             data: {
                 user: newUser
@@ -66,12 +58,9 @@ export const login = async (req:Request, res:Response) => {
                 msg: "Incorrect email or password"
             })
         }
-
-        const token = signToken(user._id)
-
+        generateToken(res, user._id)
         res.status(200).json({
             status: "success",
-            token
         })
     } catch (error:any) {
         res.status(400).json({
@@ -87,10 +76,15 @@ interface AuthRequest extends Request {
 
 export const protect = async (req:AuthRequest, res:Response, next:NextFunction  ) => {
     try {
-        // 1) Getting token and check of it's there
+        // 1) Getting token and check if it's there
         let token;
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1]
+        console.log('token from header:', token)
+    }
+    else if(req.cookies.jwt) {
+        token = req.cookies.jwt
+        console.log('token from cookie:', token)
     }
     if(!token) {
         return res.status(401).json({
@@ -100,7 +94,15 @@ export const protect = async (req:AuthRequest, res:Response, next:NextFunction  
     }
 
     // 2) Verification token
-    const decoded:any = jwt.verify(token, process.env.JWT_SECRET as string)
+    let decoded:any
+    try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET as string)
+    } catch (error:any) {
+        return res.status(401).json({
+            status: "fail",
+            msg: "Invalid token"
+        })
+    }
 
     // 3) Check if user still exists
     const currentUser = await User.findById(decoded.id)
@@ -231,11 +233,10 @@ export const resetPassword = async (req: Request, res: Response) => {
 
         // 3) Update changedPasswordAt property for the user
         // 4) Log the user in, send JWT
-        const token = signToken(user._id)
+        generateToken(res, user._id)
 
         res.status(200).json({
             status: "success",
-            token
         })
     } catch (err:any) {
         console.error(err);
@@ -273,10 +274,9 @@ export const updatePassword = async (req: AuthRequest, res: Response) => {
         await user.save()
 
         // 5) Log user in, send JWT
-        const token = signToken(user._id)
+        generateToken(res, user._id)
         res.status(200).json({
             status: "success",
-            token
         })
     } catch (err:any) {
         console.error(err);

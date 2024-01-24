@@ -14,14 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updatePassword = exports.resetPassword = exports.forgotPassword = exports.restrictTo = exports.protect = exports.login = exports.signUp = void 0;
 const crypto_1 = __importDefault(require("crypto"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const userModel_1 = __importDefault(require("../models/userModel"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const generateToken_1 = __importDefault(require("../utils/generateToken"));
 const email_1 = __importDefault(require("../utils/email"));
-const signToken = (id) => {
-    return jsonwebtoken_1.default.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN
-    });
-};
 const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, email, photo, role, password, passwordConfirm } = req.body;
@@ -40,13 +36,9 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             password,
             passwordConfirm
         });
-        const token = signToken(newUser._id);
         newUser.password = undefined || '';
-        res.cookie('jwt', token, {
-            expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-            httpOnly: true
-        })
-            .status(201).json({
+        (0, generateToken_1.default)(res, newUser._id);
+        res.status(201).json({
             status: "success",
             data: {
                 user: newUser
@@ -77,10 +69,9 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 msg: "Incorrect email or password"
             });
         }
-        const token = signToken(user._id);
+        (0, generateToken_1.default)(res, user._id);
         res.status(200).json({
             status: "success",
-            token
         });
     }
     catch (error) {
@@ -93,10 +84,15 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.login = login;
 const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // 1) Getting token and check of it's there
+        // 1) Getting token and check if it's there
         let token;
         if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             token = req.headers.authorization.split(' ')[1];
+            console.log('token from header:', token);
+        }
+        else if (req.cookies.jwt) {
+            token = req.cookies.jwt;
+            console.log('token from cookie:', token);
         }
         if (!token) {
             return res.status(401).json({
@@ -105,7 +101,16 @@ const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
             });
         }
         // 2) Verification token
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        }
+        catch (error) {
+            return res.status(401).json({
+                status: "fail",
+                msg: "Invalid token"
+            });
+        }
         // 3) Check if user still exists
         const currentUser = yield userModel_1.default.findById(decoded.id);
         if (!currentUser) {
@@ -222,10 +227,9 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         yield user.save();
         // 3) Update changedPasswordAt property for the user
         // 4) Log the user in, send JWT
-        const token = signToken(user._id);
+        (0, generateToken_1.default)(res, user._id);
         res.status(200).json({
             status: "success",
-            token
         });
     }
     catch (err) {
@@ -260,10 +264,9 @@ const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         user.passwordConfirm = req.body.passwordConfirm;
         yield user.save();
         // 5) Log user in, send JWT
-        const token = signToken(user._id);
+        (0, generateToken_1.default)(res, user._id);
         res.status(200).json({
             status: "success",
-            token
         });
     }
     catch (err) {
