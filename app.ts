@@ -1,5 +1,6 @@
 import express, {NextFunction, Request, Response} from 'express';
 import cookieParser from 'cookie-parser'
+import rateLimit from 'express-rate-limit';
 import morgan from 'morgan'
 import tourRouter from './routes/tourRoutes';
 import userRouter from './routes/userRoutes'
@@ -13,6 +14,15 @@ app.use(cookieParser())
 if(process.env.NODE_ENV === "development") {
     app.use(morgan('dev'))
 }
+
+const limiter = rateLimit({
+    max: 100,
+    windowMs: 60 * 60 * 1000,
+    message: 'Too many requests from this IP, please try again in an hour'
+
+})
+
+app.use('/api', limiter)
 
 app.use(express.static(`${__dirname}/public`))
 
