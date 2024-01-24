@@ -41,10 +41,14 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             passwordConfirm
         });
         const token = signToken(newUser._id);
-        res.status(201).json({
+        newUser.password = undefined || '';
+        res.cookie('jwt', token, {
+            expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+            httpOnly: true
+        })
+            .status(201).json({
             status: "success",
             data: {
-                token,
                 user: newUser
             }
         });
