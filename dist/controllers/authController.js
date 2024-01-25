@@ -69,9 +69,13 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 msg: "Incorrect email or password"
             });
         }
+        user.password = undefined || '';
         (0, generateToken_1.default)(res, user._id);
         res.status(200).json({
             status: "success",
+            data: {
+                user
+            }
         });
     }
     catch (error) {

@@ -1,15 +1,20 @@
 import express, {NextFunction, Request, Response} from 'express';
+import morgan from 'morgan';
+import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import rateLimit from 'express-rate-limit';
-import morgan from 'morgan'
+import mongoSanitize from 'express-mongo-sanitize'
 import tourRouter from './routes/tourRoutes';
 import userRouter from './routes/userRoutes'
 
 
 const app = express()
 
+app.use(helmet())
+
 app.use(express.json())
 app.use(cookieParser())
+app.use(mongoSanitize())
 
 if(process.env.NODE_ENV === "development") {
     app.use(morgan('dev'))
