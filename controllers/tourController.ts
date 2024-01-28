@@ -26,7 +26,10 @@ export const getAllTours = async (req:Request, res:Response) => {
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`) 
         console.log(JSON.parse(queryStr))
         
-        let query = Tour.find(JSON.parse(queryStr));
+        let query = Tour.find(JSON.parse(queryStr)).populate({
+            path: 'guides',
+            select: '-__v -passwordChangedAt'
+        });
 
         //2) SORTING
         if (typeof req.query.sort === 'string') {
@@ -77,7 +80,11 @@ export const getAllTours = async (req:Request, res:Response) => {
 
 export const getOneTour = async (req:Request, res:Response) => {
     try {
-        const tour = await Tour.findById(req.params.id)
+        const tour = await Tour.findById(req.params.id).populate({
+            path: 'guides',
+            select: '-__v -passwordChangedAt'
+        
+        })
 
         if(!tour) {
             return res.status(404).json({

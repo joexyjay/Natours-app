@@ -15,6 +15,28 @@ export interface TourInstance extends mongoose.Document {
     imageCover: string;
     images: [string];
     startDates: [Date];
+    startLocation: {
+        type: string;
+        coordinates: [number];
+        address: string;
+        description: string;
+    };
+    locations: [
+        {
+            type: string;
+            coordinates: [number];
+            address: string;
+            description: string;
+            day: number;
+        }
+    ],
+    guides: [
+        {
+            type: mongoose.Schema.Types.ObjectId;
+            ref: 'User';
+        }
+    
+    ];
 }
 
 const tourSchema = new mongoose.Schema({
@@ -82,7 +104,38 @@ const tourSchema = new mongoose.Schema({
         required: true
     },
     images: [String],
-    startDates: [Date]
+    startDates: [Date],
+    startLocation: {
+        // GeoJSON
+        type: {
+            type: String,
+            default: 'Point',
+            enum: ['Point']
+        },
+        coordinates: [Number],
+        address: String,
+        description: String
+    },
+    locations: [
+        {
+            type: {
+                type: String,
+                default: 'Point',
+                enum: ['Point']
+            },
+            coordinates: [Number],
+            address: String,
+            description: String,
+            day: Number
+        }
+    ],
+    // guides: Array // This is for embedding
+    guides: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ]
 },
 {
     timestamps: true

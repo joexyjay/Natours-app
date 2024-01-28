@@ -69,7 +69,38 @@ const tourSchema = new mongoose_1.default.Schema({
         required: true
     },
     images: [String],
-    startDates: [Date]
+    startDates: [Date],
+    startLocation: {
+        // GeoJSON
+        type: {
+            type: String,
+            default: 'Point',
+            enum: ['Point']
+        },
+        coordinates: [Number],
+        address: String,
+        description: String
+    },
+    locations: [
+        {
+            type: {
+                type: String,
+                default: 'Point',
+                enum: ['Point']
+            },
+            coordinates: [Number],
+            address: String,
+            description: String,
+            day: Number
+        }
+    ],
+    // guides: Array // This is for embedding
+    guides: [
+        {
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ]
 }, {
     timestamps: true
 });

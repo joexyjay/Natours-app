@@ -35,7 +35,10 @@ const getAllTours = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         let queryStr = JSON.stringify(queryObj);
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
         console.log(JSON.parse(queryStr));
-        let query = tourModel_1.default.find(JSON.parse(queryStr));
+        let query = tourModel_1.default.find(JSON.parse(queryStr)).populate({
+            path: 'guides',
+            select: '-__v -passwordChangedAt'
+        });
         //2) SORTING
         if (typeof req.query.sort === 'string') {
             query = query.sort(req.query.sort);
@@ -85,7 +88,10 @@ const getAllTours = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.getAllTours = getAllTours;
 const getOneTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const tour = yield tourModel_1.default.findById(req.params.id);
+        const tour = yield tourModel_1.default.findById(req.params.id).populate({
+            path: 'guides',
+            select: '-__v -passwordChangedAt'
+        });
         if (!tour) {
             return res.status(404).json({
                 status: "fail",
