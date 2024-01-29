@@ -35,7 +35,13 @@ const createReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.createReview = createReview;
 const getAllReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const allReviews = yield reviewModel_1.default.find();
+        const allReviews = yield reviewModel_1.default.find().populate({
+            path: 'tour',
+            select: 'name'
+        }).populate({
+            path: 'user',
+            select: 'name'
+        });
         res.status(200).json({
             status: "success",
             result: allReviews.length,
