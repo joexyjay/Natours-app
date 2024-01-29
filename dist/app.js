@@ -11,6 +11,7 @@ const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const express_mongo_sanitize_1 = __importDefault(require("express-mongo-sanitize"));
 const tourRoutes_1 = __importDefault(require("./routes/tourRoutes"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
+const reviewRoutes_1 = __importDefault(require("./routes/reviewRoutes"));
 const app = (0, express_1.default)();
 app.use((0, helmet_1.default)());
 app.use(express_1.default.json());
@@ -32,6 +33,7 @@ app.use((req, res, next) => {
 });
 app.use('/api/v1/tours', tourRoutes_1.default);
 app.use('/api/v1/users', userRoutes_1.default);
+app.use('/api/v1/reviews', reviewRoutes_1.default);
 app.all('*', (req, res, next) => {
     res.status(404).json({
         status: 'fail',

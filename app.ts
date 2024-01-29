@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize'
 import tourRouter from './routes/tourRoutes';
 import userRouter from './routes/userRoutes'
+import reviewRouter from './routes/reviewRoutes'
 
 
 const app = express()
@@ -38,6 +39,7 @@ app.use((req:Request, res:Response, next:NextFunction)=> {
 
 app.use('/api/v1/tours', tourRouter)
 app.use('/api/v1/users', userRouter)
+app.use('/api/v1/reviews', reviewRouter)
 
 app.all('*', (req:Request, res:Response, next:NextFunction) => {
     res.status(404).json({

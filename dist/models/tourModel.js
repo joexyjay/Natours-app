@@ -102,7 +102,9 @@ const tourSchema = new mongoose_1.default.Schema({
         }
     ]
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 //DOCUMENT MIDDLEWARE: Runs before .save() and .create() command
 // tourSchema.pre('save', function(){
