@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Query } from "mongoose";
 
 export interface ReviewInstance extends mongoose.Document {
     review: string;
@@ -35,6 +36,17 @@ const reviewSchema = new mongoose.Schema({
 },
 )
 
-const Review = mongoose.model<ReviewInstance>('Review', reviewSchema)
+reviewSchema.pre(/^find/, function(this: Query<ReviewInstance[], ReviewInstance>, next) {
+    this.populate({
+        path: 'user',
+        select: 'name'
+    }).populate({
+        path: 'tour',
+        select: 'name'
+    });
+    next();
+});
+
+const Review = mongoose.model<ReviewInstance>('Review', reviewSchema);
 
 export default Review;

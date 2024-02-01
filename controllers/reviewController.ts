@@ -21,20 +21,32 @@ export const createReview = async (req:Request, res:Response) => {
 
 export const getAllReviews = async (req:Request, res:Response) => {
     try {
-        const allReviews = await Review.find().populate({
-            path: 'tour',
-            select: 'name'
+        const allReviews = await Review.find()
         
-        }).populate({
-            path: 'user',
-            select: 'name'
-        
-        })
         res.status(200).json({
             status: "success",
             result: allReviews.length,
             data: {
                 allReviews
+            }
+        })
+        
+    } catch (error:any) {
+        res.status(400).json({
+            status: "fail",
+            msg: error.message
+        })
+    }
+}
+
+export const getReview = async (req:Request, res:Response) => {
+    try {
+        const review = await Review.findById(req.params.id)
+        
+        res.status(200).json({
+            status: "success",
+            data: {
+                review
             }
         })
         

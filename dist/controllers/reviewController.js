@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllReviews = exports.createReview = void 0;
+exports.getReview = exports.getAllReviews = exports.createReview = void 0;
 const reviewModel_1 = __importDefault(require("../models/reviewModel"));
 const createReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -35,13 +35,7 @@ const createReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.createReview = createReview;
 const getAllReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const allReviews = yield reviewModel_1.default.find().populate({
-            path: 'tour',
-            select: 'name'
-        }).populate({
-            path: 'user',
-            select: 'name'
-        });
+        const allReviews = yield reviewModel_1.default.find();
         res.status(200).json({
             status: "success",
             result: allReviews.length,
@@ -58,3 +52,21 @@ const getAllReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.getAllReviews = getAllReviews;
+const getReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const review = yield reviewModel_1.default.findById(req.params.id);
+        res.status(200).json({
+            status: "success",
+            data: {
+                review
+            }
+        });
+    }
+    catch (error) {
+        res.status(400).json({
+            status: "fail",
+            msg: error.message
+        });
+    }
+});
+exports.getReview = getReview;

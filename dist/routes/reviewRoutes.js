@@ -11,4 +11,5 @@ router
     .route('/')
     .get(reviewController_1.getAllReviews)
     .post(authController_1.protect, (0, authController_1.restrictTo)('user'), reviewController_1.createReview);
+router.route('/:id').get(reviewController_1.getReview);
 exports.default = router;
