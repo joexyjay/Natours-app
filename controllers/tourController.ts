@@ -84,6 +84,9 @@ export const getOneTour = async (req:Request, res:Response) => {
             path: 'guides',
             select: '-__v -passwordChangedAt'
         
+        }).populate({
+            path: 'reviews',
+            select: '-__v -passwordChangedAt'
         })
 
         if(!tour) {

@@ -110,5 +110,10 @@ const tourSchema = new mongoose_1.default.Schema({
 // tourSchema.pre('save', function(){
 //     console.log(this)
 // })
+tourSchema.virtual('reviews', {
+    ref: 'Review',
+    foreignField: 'tour',
+    localField: '_id'
+});
 const Tour = mongoose_1.default.model('Tour', tourSchema);
 exports.default = Tour;

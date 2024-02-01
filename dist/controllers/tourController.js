@@ -91,6 +91,9 @@ const getOneTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const tour = yield tourModel_1.default.findById(req.params.id).populate({
             path: 'guides',
             select: '-__v -passwordChangedAt'
+        }).populate({
+            path: 'reviews',
+            select: '-__v -passwordChangedAt'
         });
         if (!tour) {
             return res.status(404).json({

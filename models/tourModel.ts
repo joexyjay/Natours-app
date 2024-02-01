@@ -148,6 +148,13 @@ const tourSchema = new mongoose.Schema({
 //     console.log(this)
 // })
 
+tourSchema.virtual('reviews', {
+    ref: 'Review',
+    foreignField: 'tour',
+    localField: '_id'
+
+})
+
 const Tour = mongoose.model<TourInstance>('Tour', tourSchema)
 
 export default Tour

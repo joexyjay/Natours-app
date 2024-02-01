@@ -33,10 +33,11 @@ reviewSchema.pre(/^find/, function (next) {
     this.populate({
         path: 'user',
         select: 'name'
-    }).populate({
-        path: 'tour',
-        select: 'name'
     });
+    // .populate({
+    //     path: 'tour',
+    //     select: 'name'
+    // });
     next();
 });
 const Review = mongoose_1.default.model('Review', reviewSchema);

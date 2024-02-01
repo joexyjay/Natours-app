@@ -40,10 +40,11 @@ reviewSchema.pre(/^find/, function(this: Query<ReviewInstance[], ReviewInstance>
     this.populate({
         path: 'user',
         select: 'name'
-    }).populate({
-        path: 'tour',
-        select: 'name'
-    });
+    })
+    // .populate({
+    //     path: 'tour',
+    //     select: 'name'
+    // });
     next();
 });
 
