@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const reviewController_1 = require("../controllers/reviewController");
 const authController_1 = require("../controllers/authController");
-const router = express_1.default.Router();
+const router = express_1.default.Router({ mergeParams: true });
 router
     .route('/')
     .get(reviewController_1.getAllReviews)

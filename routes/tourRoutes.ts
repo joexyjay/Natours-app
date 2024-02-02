@@ -10,9 +10,12 @@ import {
     getTourStats,
     getMonthlyPlan
  } from "../controllers/tourController";
- import { createReview } from "../controllers/reviewController";
+ import reviewRouter from "./reviewRoutes";
 
 const router = express.Router()
+
+// Nested routes
+router.use('/:tourId/reviews', reviewRouter)
 
 router.route('/top-5-cheap').get(aliasTopTours, getAllTours)
 
@@ -31,8 +34,8 @@ router
     .patch(updateTour)
     .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour)
 
-router
-    .route('/:tourId/reviews')
-    .post(protect, restrictTo('user'), createReview)    
+// router
+//     .route('/:tourId/reviews')
+//     .post(protect, restrictTo('user'), createReview)    
 
 export default router
