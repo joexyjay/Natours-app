@@ -3,6 +3,9 @@ import Review from "../models/reviewModel";
 
 export const createReview = async (req:Request, res:Response) => {
     try {
+        // Allow nested routes
+        if (!req.body.tour) req.body.tour = req.params.tourId
+        if (!req.body.user) req.body.user = (req as any).user.id
         const newReview = await Review.create(req.body)
         res.status(201).json({
             status: "success",

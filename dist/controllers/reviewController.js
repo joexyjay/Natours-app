@@ -16,6 +16,11 @@ exports.getReview = exports.getAllReviews = exports.createReview = void 0;
 const reviewModel_1 = __importDefault(require("../models/reviewModel"));
 const createReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // Allow nested routes
+        if (!req.body.tour)
+            req.body.tour = req.params.tourId;
+        if (!req.body.user)
+            req.body.user = req.user.id;
         const newReview = yield reviewModel_1.default.create(req.body);
         res.status(201).json({
             status: "success",

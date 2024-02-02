@@ -10,6 +10,7 @@ import {
     getTourStats,
     getMonthlyPlan
  } from "../controllers/tourController";
+ import { createReview } from "../controllers/reviewController";
 
 const router = express.Router()
 
@@ -29,5 +30,9 @@ router
     .get(getOneTour)
     .patch(updateTour)
     .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour)
+
+router
+    .route('/:tourId/reviews')
+    .post(protect, restrictTo('user'), createReview)    
 
 export default router
