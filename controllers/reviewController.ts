@@ -24,7 +24,10 @@ export const createReview = async (req:Request, res:Response) => {
 
 export const getAllReviews = async (req:Request, res:Response) => {
     try {
-        const allReviews = await Review.find()
+        let filter:any = {}
+        if (req.params.tourId) filter = {tour: req.params.tourId}
+
+        const allReviews = await Review.find(filter)
         
         res.status(200).json({
             status: "success",

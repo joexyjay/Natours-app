@@ -40,7 +40,10 @@ const createReview = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.createReview = createReview;
 const getAllReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const allReviews = yield reviewModel_1.default.find();
+        let filter = {};
+        if (req.params.tourId)
+            filter = { tour: req.params.tourId };
+        const allReviews = yield reviewModel_1.default.find(filter);
         res.status(200).json({
             status: "success",
             result: allReviews.length,

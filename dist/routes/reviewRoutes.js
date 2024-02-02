@@ -7,6 +7,10 @@ const express_1 = __importDefault(require("express"));
 const reviewController_1 = require("../controllers/reviewController");
 const authController_1 = require("../controllers/authController");
 const router = express_1.default.Router({ mergeParams: true });
+// Nested routes
+// POST /tour/234fad4/reviews
+// GET /tour/234fad4/reviews
+// GET /tour/234fad4/reviews/2342df
 router
     .route('/')
     .get(reviewController_1.getAllReviews)
