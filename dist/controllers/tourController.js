@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMonthlyPlan = exports.getTourStats = exports.deleteTour = exports.updateTour = exports.createTour = exports.getOneTour = exports.getAllTours = exports.aliasTopTours = void 0;
 const tourModel_1 = __importDefault(require("../models/tourModel"));
+const handlerFactory_1 = require("./handlerFactory");
 // const tours = JSON
 // .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // .toString())
@@ -168,28 +169,27 @@ const updateTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updateTour = updateTour;
-const deleteTour = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const tour = yield tourModel_1.default.findByIdAndDelete(req.params.id);
-        if (!tour) {
-            return res.status(404).json({
-                status: "fail",
-                msg: "No tour found with that ID"
-            });
-        }
-        res.status(200).json({
-            status: 'success',
-            message: 'Tour deleted successfully',
-        });
-    }
-    catch (error) {
-        res.status(500).json({
-            status: "fail",
-            msg: 'internal server error'
-        });
-    }
-});
-exports.deleteTour = deleteTour;
+exports.deleteTour = (0, handlerFactory_1.deleteOne)(tourModel_1.default);
+// export const deleteTour = async (req:Request, res:Response) => {
+//     try {
+//         const tour = await Tour.findByIdAndDelete(req.params.id)
+//         if(!tour) {
+//             return res.status(404).json({
+//                 status: "fail",
+//                 msg: "No tour found with that ID"
+//             })
+//         }
+//         res.status(200).json({
+//             status: 'success',
+//             message: 'Tour deleted successfully',
+//         })
+//     } catch (error:any) {
+//         res.status(500).json({
+//             status: "fail",
+//             msg: 'internal server error'
+//         }) 
+//     } 
+// }
 const getTourStats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const stats = yield tourModel_1.default.aggregate([

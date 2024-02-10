@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Tour from '../models/tourModel';
 import { AnyExpression, SortOrder } from 'mongoose';
+import { deleteOne, } from "./handlerFactory";
 
 // const tours = JSON
 // .parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -162,27 +163,29 @@ export const updateTour = async (req:Request, res:Response) => {
     }
 }
 
-export const deleteTour = async (req:Request, res:Response) => {
-    try {
-        const tour = await Tour.findByIdAndDelete(req.params.id)
-        if(!tour) {
-            return res.status(404).json({
-                status: "fail",
-                msg: "No tour found with that ID"
-            })
-        }
-        res.status(200).json({
-            status: 'success',
-            message: 'Tour deleted successfully',
-        })
-    } catch (error:any) {
-        res.status(500).json({
-            status: "fail",
-            msg: 'internal server error'
-        }) 
-    } 
+export const deleteTour = deleteOne(Tour)
+
+// export const deleteTour = async (req:Request, res:Response) => {
+//     try {
+//         const tour = await Tour.findByIdAndDelete(req.params.id)
+//         if(!tour) {
+//             return res.status(404).json({
+//                 status: "fail",
+//                 msg: "No tour found with that ID"
+//             })
+//         }
+//         res.status(200).json({
+//             status: 'success',
+//             message: 'Tour deleted successfully',
+//         })
+//     } catch (error:any) {
+//         res.status(500).json({
+//             status: "fail",
+//             msg: 'internal server error'
+//         }) 
+//     } 
    
-}
+// }
 
 export const getTourStats = async (req:Request, res:Response) => {
     try {
